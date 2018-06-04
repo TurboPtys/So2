@@ -2,10 +2,12 @@
 #include <iostream>
 #include <Windows.h>
 #include <cstdlib>
+#include <ctime>
 #include <mutex>
 #include <thread>
 #include <pthread.h>
 #include <vector>
+
 
 using namespace std;
 
@@ -20,7 +22,7 @@ int kierW[5] = { NULL, NULL, NULL, NULL, NULL };
 //osie
 int aixSztygar[2] = { 24, 24 };
 int aix[8] = { 60, 60, 60, 60, 60,60,60,60 };
-int aiyCorf[4]{5,5,5,5};
+int aiyCorf[4]{5,5,4,5};
 int aixCorf[4]{28, 30, 28, 30};
 
 float dones[10];
@@ -28,15 +30,15 @@ float speedWorks[10];
 
 
 //sta³e
-int static kilofy = 2;
-int static miejsca = 1;
+int static kilofy = 3;
+int static miejsca = 2;
 int static wozek[2] = { 2, 2 };
 
 
 
 //zmienne pomocnicze
 int zKilofy = 0;
-int zMiejsca = 1;
+int zMiejsca = 0;
 int zGold = 0;
 int zWozek[2] = { 0, 0 };
 int zDrogaKier[4] = { 0, 0, 0, 0 };
@@ -53,8 +55,16 @@ mutex mtx_drogaWolna;
 class Diger{
 
 public:
-	Diger();
-	Diger(int in,int sz);
+	Diger(){
+		index = NULL;
+
+	};
+	Diger(int in, int sz){
+
+		index = in;
+		sztygar = sz;
+
+	};
 	int index;
 	int sztygar;
 	int x = 62;
@@ -71,9 +81,11 @@ public:
 			
 			checkKilof();
 			move(4, false, 3);
+			getPlace();
 			dig();
 			move(22, true, 3);
-			sendGold();
+			//sendGold();
+			loadCorf();
 			move(58, true, 3);
 			
 
@@ -128,32 +140,39 @@ public:
 
 
 	}
-
-	bool dig(){
+	bool getPlace(){
 		stan[index] = 5;
 
 		mtx_miejsce.lock();
 		zMiejsca++;
+		while (true){
 			if (zMiejsca <= miejsca){
 
 
-			mtx_miejsce.unlock();
+				mtx_miejsce.unlock();
+				return true;
 			}
+		}
+		return false;
+	}
+
+	bool dig(){
 
 			stan[index] = 6;
 
 			mtx_gold.lock();
-			zGold = gold;
-			zGold--;
+			//zGold = gold;
+			//zGold--;
+			
 			bool tryDig = true;
 
 			while (tryDig){
-				if (zGold > 0){
-
+				if (gold > 0){
+					gold--;
 					mtx_gold.unlock();
 					tryDig = false;
 				}
-				zGold = gold;
+				//zGold = gold;
 			}
 
 			for (int i = 0; i < 3; i++){
@@ -172,10 +191,10 @@ public:
 		}
 		
 
-		gold = gold - 1;
+		//gold--;
 		zKilofy--;
 		zMiejsca--;
-		mtx_miejsce.unlock();
+		//mtx_miejsce.unlock();
 
 		return true;
 	}
@@ -183,18 +202,43 @@ public:
 	bool sendGold(){
 
 		stan[index] = 8;
+		
 		while (true){
-			if (aixSztygar[0] == 24 && zWozek[sztygar] <= wozek[sztygar]){
-
+			
+			if (aixSztygar[sztygar] == 24 && zWozek[sztygar] <= wozek[sztygar]){
+				
+				mtx_wozek.lock();
+				stan[index] = 9;
 				for (int i = 0; i < 3; i++){
 					Sleep(250);
 				}
+
+				zWozek[sztygar]++;
+				mtx_wozek.unlock();
 				
-				return true;
 			}
 		}
 
 
+	}
+
+	bool loadCorf(){
+
+		stan[index] = 8;
+		//mtx_wozek.lock();
+		//zWozek[sztygar]++;
+		while (true){
+			if (aixSztygar[sztygar] == 24 && zWozek[sztygar] <= wozek[sztygar]){
+				stan[index] = 9;
+				//mtx_wozek.unlock();
+
+				
+				stan[index] = 10;
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	bool wait(){
@@ -211,23 +255,18 @@ public:
 	}
 };
 
-Diger::Diger(int in,int sz){
-
-	index = in;
-	sztygar = sz;
-
-}
-
-Diger::Diger(){
-index = NULL;
-
-}
-
 class Nature{
 
 public:
-	Nature();
-	Nature(int i,int m);
+	Nature(){
+		index = NULL;
+	};
+	Nature(int i, int m){
+
+		index = i;
+		maxGold = m;
+
+	};
 	int index;
 	int maxGold;
 
@@ -245,7 +284,8 @@ public:
 				Sleep(250);
 
 			}
-			addGold(3);
+			int a = rand() % 3 + 3;
+			addGold(a);
 
 		}
 	}
@@ -273,23 +313,16 @@ public:
 
 };
 
-Nature::Nature(int i,int m){
-
-		index = i;
-		maxGold = m;
-
-	}
-
-Nature::Nature(){
-		index = NULL;
-	}
-
 class Sztygar{
 public:
 	
 	int index;
-	Sztygar();
-	Sztygar(int i);
+	Sztygar(){
+		index = NULL;
+	};
+	Sztygar(int i){
+		index = i;
+	};
 
 	void operator()(){
 
@@ -364,14 +397,6 @@ public:
 
 };
 
-Sztygar::Sztygar(int i){
-	index = i;
-}
-
-Sztygar::Sztygar(){
-	index = NULL;
-}
-
 class Corf{
 public:
 	int index;
@@ -399,7 +424,7 @@ public:
 			Sleep(500);
 			checkWay(2);
 			goDown(1, 5);
-			Sleep(500);
+			//Sleep(500);
 		}
 
 	}
@@ -409,31 +434,28 @@ public:
 		wozekS[index] = 1;
 		while (true)
 		{
-
 			for (int i = 0; i < 8; i++){
-			
-				
-				if (stan[i] == 8 && aixSztygar[korytarz] == 24){
-					
+
+				if (stan[i] == 10){
+
 					mtx_wozek.lock();
 					zWozek[korytarz]++;
-					
 
 					while (true){
+
 						if (zWozek[korytarz] <= wozek[korytarz]){
-
-
 							mtx_wozek.unlock();
-						
 							return true;
 						}
+
 					}
+					
+
 				}
 
 			}
 
 		}
-
 
 	}
 
@@ -442,24 +464,29 @@ public:
 		wozekS[index] = 2;
 		kierW[index] = way;
 		mtx_drogaWolna.lock();
-		Sleep(500);
-		if (zDrogaKier[2 * korytarz] == 0 || zDrogaKier[2*korytarz]==way){
+	
 
-			zDrogaKier[2*korytarz] = way;
-			zDroga[2 * korytarz]++;
-			mtx_drogaWolna.unlock();
-			droga = 28;
+		while (true){
+			if (zDrogaKier[2 * korytarz] == 0 || zDrogaKier[2 * korytarz] == way){
+
+				zDrogaKier[2 * korytarz] = way;
+				zDroga[2 * korytarz]++;
+				mtx_drogaWolna.unlock();
+				droga = 28;
+				return true;
+			}
+			else if (zDrogaKier[2 * korytarz + 1] == 0 || zDrogaKier[2 * korytarz + 1] == way)
+			{
+				zDrogaKier[2 * korytarz + 1] = way;
+				zDroga[2 * korytarz + 1]++;
+				mtx_drogaWolna.unlock();
+				droga = 30;
+
+				return true;
+			}
+
+			
 		}
-		else if (zDrogaKier[2 * korytarz +1] == 0 || zDrogaKier[2 * korytarz+1] == way)
-		{
-			zDrogaKier[2 * korytarz +1] = way;
-			zDroga[2 * korytarz + 1]++;
-			mtx_drogaWolna.unlock();
-			droga = 30;
-
-		}
-
-		return true;
 	}
 
 	bool goUp(int start, int dest){
@@ -501,6 +528,8 @@ public:
 		}
 
 		mtx_drogaWolna.lock();
+		/////////////////////////
+		wozekS[index] = 6;
 		if (droga == 28){
 			zDroga[2 * korytarz]--;
 		}
@@ -517,8 +546,12 @@ public:
 			zDrogaKier[2 * korytarz + 1] = 0;
 
 		}
+		/////////////////////////
+		wozekS[index] = 7;
 		mtx_drogaWolna.unlock();
+		mtx_wozek.lock();
 		zWozek[korytarz]--;
+		mtx_wozek.unlock();
 		return true;
 	}
 };
@@ -539,25 +572,27 @@ void* check(void *){
 int main(){
 
 	bool d = false;
+	srand(time(NULL));
 	
 	//tworzenie obiektów
 	Nature n = Nature(0, 10);
 	Sztygar Sz[2] = { Sztygar(0), Sztygar(1) };
 	Diger K[8];
-	Corf C[5];
+	Corf C[3];
 	for (int i = 0; i < 8; i++){
 
 		K[i] = Diger(i,0);
 	}
 
-	for (int i = 0; i < 5; i++){
+	for (int i = 0; i < 3; i++){
 		C[i] = Corf(i, 0);
 	}
 
 
 	thread kop[8];
-	thread corf[5];
+	thread corf[3];
 
+	//w¹tki
 	for (int i = 0; i < 8; i++){
 		kop[i] = thread(&Diger::operator(), K[i]);
 	}
@@ -566,7 +601,7 @@ int main(){
 		corf[i] = thread(&Corf::operator(), C[i]);
 	}
 
-	//w¹tki
+	
 	pthread_t cyk;
 
 	pthread_create(&cyk, NULL, check, NULL);
@@ -598,7 +633,7 @@ int main(){
 			printw("Czas: %.2f s zmiejsca: %d gold: %d/t%d Postep:%.0f Seed: %.2f   ", (float)i / 4,zMiejsca,gold,aixSztygar[0],dones[0],speedWorks[0]);
 			attroff(A_BOLD);
 			
-			printw("U1  %d %d\t %d %d\t %d%d\t ||%d %d||%d %d |-|%d", wozekS[0],kierW[0], wozekS[1],kierW[1], wozekS[2],kierW[2],zDrogaKier[0],zDrogaKier[1],zDroga[0],zDroga[1],zWozek[0]);
+			printw("U1  %d %d\t %d %d\t %d%d\t |^|%d %d|x|%d %d |-|%d", wozekS[0],kierW[0], wozekS[1],kierW[1], wozekS[2],kierW[2],zDrogaKier[0],zDrogaKier[1],zDroga[0],zDroga[1],zWozek[0]);
 			attron(A_BOLD);
 
 			int rzedy = 0;
@@ -689,6 +724,7 @@ int main(){
 			//	mvwprintw(win, i, 60, "K%d", i);
 			//}
 
+			wattron(win, COLOR_PAIR(1));
 			for (int i = 1; i < 9; i++){
 				
 				mvwprintw(win2, i, 60, "K%d", i+8);

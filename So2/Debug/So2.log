@@ -1,14 +1,15 @@
-﻿Build started 2018-06-01 13:35:31.
+﻿Build started 2018-06-04 13:58:24.
      1>Project "C:\Users\Szymon\Documents\Visual Studio 2013\Projects\So2\So2\So2.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt Main.cpp
          Main.cpp
      1>c:\program files (x86)\windows kits\8.1\include\um\wincon.h(118): warning C4005: 'MOUSE_MOVED' : macro redefinition
                  c:\microsoft visual studio 12.0\vc\include\curses.h(160) : see previous definition of 'MOUSE_MOVED'
-     1>c:\users\szymon\documents\visual studio 2013\projects\so2\so2\main.cpp(169): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\szymon\documents\visual studio 2013\projects\so2\so2\main.cpp(710): warning C4258: 'i' : definition from the for loop is ignored; the definition from the enclosing scope is used
-                 c:\users\szymon\documents\visual studio 2013\projects\so2\so2\main.cpp(692) : definition of 'i' ignored
-                 c:\users\szymon\documents\visual studio 2013\projects\so2\so2\main.cpp(578) : definition of 'i' used
+     1>c:\users\szymon\documents\visual studio 2013\projects\so2\so2\main.cpp(188): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\szymon\documents\visual studio 2013\projects\so2\so2\main.cpp(575): warning C4244: 'argument' : conversion from 'time_t' to 'unsigned int', possible loss of data
+     1>c:\users\szymon\documents\visual studio 2013\projects\so2\so2\main.cpp(746): warning C4258: 'i' : definition from the for loop is ignored; the definition from the enclosing scope is used
+                 c:\users\szymon\documents\visual studio 2013\projects\so2\so2\main.cpp(728) : definition of 'i' ignored
+                 c:\users\szymon\documents\visual studio 2013\projects\so2\so2\main.cpp(613) : definition of 'i' used
        Link:
          C:\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Szymon\Documents\Visual Studio 2013\Projects\So2\Debug\So2.exe" /INCREMENTAL /NOLOGO "C:\Users\Szymon\Documents\Visual Studio 2013\Projects\So2\So2\lib\pdcurses.lib" pthreadVC2.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Szymon\Documents\Visual Studio 2013\Projects\So2\Debug\So2.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Szymon\Documents\Visual Studio 2013\Projects\So2\Debug\So2.lib" /MACHINE:X86 Debug\Main.obj
          So2.vcxproj -> C:\Users\Szymon\Documents\Visual Studio 2013\Projects\So2\Debug\So2.exe
@@ -16,4 +17,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:02.45
+Time Elapsed 00:00:02.57
